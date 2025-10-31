@@ -1,0 +1,161 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+    monospace;
+}
+
+.divMenuPpal {
+  background-color: #3299ff;
+}
+
+.divSubMenuPpal {
+  width: 85%;
+  background-color: rgba(0, 0, 0, 0.637);
+  color: rgb(255, 255, 255);
+}
+
+#primerosDatos {
+  display: flex;
+  justify-content: space-around;
+}
+
+#primerosDatos>div {
+  margin: 0 50px;
+  border: solid;
+  min-width: 50px;
+  max-width: 125px;
+}
+
+#primerosDatos2 {
+  display: flex;
+  justify-content: space-around;
+}
+
+#primerosDatos2>div {
+  margin: 0 50px;
+  border: solid;
+  min-width: 50px;
+  max-width: 200px;
+}
+
+.miCuadrado {
+  min-width: 120px;
+  max-width: 150px;
+  right: 10px;
+  background: teal;
+  text-align: center;
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+  border-radius: 15px;
+  /* sombra por defecto */
+  box-shadow: 0px 5px 15px rgb(255, 0, 0);
+
+  /* transición suave para transform y sombra */
+  transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+}
+
+.miCuadrado:hover {
+  transform: scale(1.05);
+  /* efecto de escala */
+  box-shadow: 0px 5px 3px rgba(255, 3, 3, 0.457);
+  /* sombra más difusa */
+}
+
+.miCuadrado select {
+  margin-top: 5px;
+  margin-bottom: 5px;
+}
+
+.select-custom {
+  width: 150px;
+  /* Ancho fijo o puede ser % */
+  padding: 8px 12px;
+  /* Padding interno */
+  border-radius: 8px;
+  /* Bordes redondeados */
+  border: 1px solid #4B5563;
+  /* Borde gris oscuro */
+  background-color: #374151;
+  /* Fondo gris oscuro */
+  color: #FFFFFF;
+  /* Texto blanco */
+  font-size: 14px;
+  /* Tamaño de texto */
+  cursor: pointer;
+  /* Cursor tipo puntero */
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+  /* Sombra suave */
+  transition: all 0.2s ease-in-out;
+}
+
+.select-custom:focus {
+  outline: none;
+  /* Quita el outline por defecto */
+  border-color: #3B82F6;
+  /* Borde azul al enfocar */
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.3);
+  /* Sombra azul */
+}
+
+.select-custom option {
+  background-color: #1F2937;
+  /* Fondo de las opciones */
+  color: #FFFFFF;
+  /* Texto de las opciones */
+}
+
+.btnFlotante {
+  font: 1em sans-serif;
+  background-color: aliceblue;
+  width: 150px;
+  height: 50px;
+  position: absolute;
+  top: 5px;
+  border-radius: 20px;
+  z-index: 1000;
+}
+
+.btnFlotante:hover {
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+  background-color: tomato;
+  transition: 0.3s ease-in-out;
+}
+
+.btnVolverMPpal {
+  left: 20px;
+}
+
+.btnActualizar {
+  right: 20px;
+}
+
+.myLabels {
+  color: white;
+}
+
+.subdivMenuPpal:hover {
+  background-color: #2678cc;
+}
+
+.subdivMenuPpal {
+  background-color: #2678cc;
+  margin: 25px;
+  padding: 25px;
+  display: inline-flex;
+  min-width: 150px;
+  border-radius: 33px;
+  color: white
+}

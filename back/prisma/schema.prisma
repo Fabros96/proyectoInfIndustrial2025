@@ -1,0 +1,79 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js" // Cliente oficial JS
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "mysql"           
+  url      = env("DATABASE_URL")
+}
+
+model Tiempo {
+  id_tiempo Int           @id @default(autoincrement())
+  anio      Int
+  mes       Int
+
+  // Relaciones 1:N
+  produccion Produccion[]
+  ventas     Ventas[]
+  calidad    Calidad[]
+  logistica  Logistica[]
+}
+
+model Produccion {
+  id_produccion          Int       @id @default(autoincrement())
+  id_tiempo              Int
+  horas_produccion       Decimal   @db.Decimal(10, 2)
+  horas_improductivas    Decimal   @db.Decimal(10, 2)
+  costo_total_produccion Decimal   @db.Decimal(12, 2)
+  unidades_producidas    Int
+  unidades_sin_defectos  Int
+  equipo_con_fallas      String    @db.VarChar(50)
+
+  // Relación con tiempo
+  tiempo Tiempo @relation(fields: [id_tiempo], references: [id_tiempo], onDelete: Cascade)
+}
+
+model Ventas {
+  id_venta        Int     @id @default(autoincrement())
+  id_tiempo       Int
+  ventas_totales  Decimal @db.Decimal(12, 2)
+  unidades_vendidas Int
+  costo_ventas    Decimal @db.Decimal(12, 2)
+  nuevos_clientes Int
+  clientes_activos Int
+
+  // Relación con tiempo
+  tiempo Tiempo @relation(fields: [id_tiempo], references: [id_tiempo], onDelete: Cascade)
+}
+
+model Calidad {
+  id_calidad             Int     @id @default(autoincrement())
+  id_tiempo              Int
+  productos_inspeccionados Int
+  productos_no_conformes Int
+  reclamos_recibidos     Int
+  tiempo_resolucion_horas Decimal @db.Decimal(10, 2)
+
+  // Relación con tiempo
+  tiempo Tiempo @relation(fields: [id_tiempo], references: [id_tiempo], onDelete: Cascade)
+}
+
+model Logistica {
+  id_logistica              Int     @id @default(autoincrement())
+  id_tiempo                 Int
+  total_pedidos             Int
+  pedidos_entregados_a_tiempo Int
+  tiempo_entrega_dias       Decimal @db.Decimal(10, 2)
+  costo_logistico_total     Decimal @db.Decimal(12, 2)
+  unidades_enviadas         Int
+
+  // Relación con tiempo
+  tiempo Tiempo @relation(fields: [id_tiempo], references: [id_tiempo], onDelete: Cascade)
+}
