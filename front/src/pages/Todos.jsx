@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import { useEffect, useState, useCallback } from "react";
 import {
   LineChart,
@@ -31,7 +32,7 @@ export default function DashboardCompleto() {
       const resKpis = await fetch("http://localhost:3000/api/kpis/dashboard");
       const resultKpis = await resKpis.json();
       setData(resultKpis);
-
+      if (!loading) console.log(JSON.stringify(resultKpis, null, 2));
       const resVentas = await fetch("http://localhost:3000/api/kpis/ventas");
       const resultVentas = await resVentas.json();
       setVentasData(resultVentas);

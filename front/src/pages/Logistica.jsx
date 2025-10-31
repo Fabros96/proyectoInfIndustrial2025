@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import { useEffect, useState } from "react";
 import {
   LineChart,
@@ -27,7 +28,7 @@ export default function Logistica() {
       const res = await fetch("http://localhost:3000/api/kpis/logistica");
       const result = await res.json();
       setData(result);
-
+      if (!loading) console.log(JSON.stringify(result, null, 2));
       if (!availableYears.length && result.length) {
         const años = Array.from(new Set(result.map((d) => d.anio))).sort();
         setAvailableYears(años);
