@@ -55,7 +55,7 @@ export default function Ventas() {
       ? data
       : data.filter((item) => item.anio === parseInt(selectedYear));
 
-  if (!data.length)
+  if (!data.length )
     return <p className="text-center mt-10">Cargando datos de ventas...</p>;
 
   const ultimo = dataFiltrada[dataFiltrada.length - 1];
@@ -279,24 +279,24 @@ export default function Ventas() {
 
   return (
     <div className="relative p-6 space-y-8 divSubMenuPpal">
-      {/* Dropdown años */}
-      <div className="fixed top-6 right-2.5 bg-gray-800 p-4 rounded-lg shadow-lg z-50 miCuadrado">
-        <h4 className="text-white font-semibold mb-2">Filtrar por año</h4>
-        <select
-          id="yearSelect"
-          name="year"
-          value={selectedYear}
-          onChange={(e) => setSelectedYear(e.target.value)}
-          className="select-custom"
-        >
-          <option value="todos">Todos</option>
-          {availableYears.map((anio) => (
-            <option key={anio} value={anio}>
-              {anio}
-            </option>
-          ))}
-        </select>
-      </div>
+        {/* Dropdown años */}
+        <div className="fixed top-6 right-2.5 bg-gray-800 p-4 rounded-lg shadow-lg z-50 miCuadrado">
+          <h4 className="text-white font-semibold mb-2">Filtrar por año</h4>
+          <select
+            id="yearSelect"
+            name="year"
+            value={selectedYear}
+            onChange={(e) => setSelectedYear(e.target.value)}
+            className="select-custom"
+          >
+            <option value="todos">Todos</option>
+            {availableYears.map((anio) => (
+              <option key={anio} value={anio}>
+                {anio}
+              </option>
+            ))}
+          </select>
+        </div>
 
       {/* Botones superiores */}
       <div className="flex justify-between items-center mb-6">

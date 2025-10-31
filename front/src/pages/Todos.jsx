@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import {
   LineChart,
   Line,
@@ -20,11 +20,12 @@ export default function DashboardCompleto() {
   const [data, setData] = useState([]);
   const [ventasData, setVentasData] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [selectedYears, setSelectedYears] = useState([]);
+  const [availableYears, setAvailableYears] = useState([]);
+  const [selectedYear, setSelectedYear] = useState("todos");
 
   const navigate = useNavigate();
 
-  const fetchData = async () => {
+  const fetchData = useCallback(async () => {
     setLoading(true);
     try {
       const resKpis = await fetch("http://localhost:3000/api/kpis/dashboard");
@@ -34,21 +35,34 @@ export default function DashboardCompleto() {
       const resVentas = await fetch("http://localhost:3000/api/kpis/ventas");
       const resultVentas = await resVentas.json();
       setVentasData(resultVentas);
-      // Inicializamos los años disponibles y seleccionados (todos)
-      const añosDisponibles = Array.from(
-        new Set(resultKpis.map((d) => d.anio))
-      );
-      setSelectedYears(añosDisponibles);
+
+      // set available years only if not already set
+      setAvailableYears((prev) => {
+        if (prev.length) return prev;
+        if (!resultKpis.length) return prev;
+        const años = Array.from(new Set(resultKpis.map((d) => d.anio))).sort();
+        return años;
+      });
     } catch (err) {
       console.error("Error al cargar datos:", err);
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
   useEffect(() => {
     fetchData();
-  }, []);
+  }, [fetchData]);
+
+  const dataFiltrada =
+    selectedYear === "todos"
+      ? data
+      : data.filter((item) => item.anio === parseInt(selectedYear));
+
+  const ventasFiltrada =
+    selectedYear === "todos"
+      ? ventasData
+      : ventasData.filter((item) => item.anio === parseInt(selectedYear));
 
   if (!data.length || !ventasData.length)
     return <p className="text-center mt-10">Cargando dashboard completo...</p>;
@@ -71,29 +85,30 @@ export default function DashboardCompleto() {
     return `${meses[mes - 1]}.${anio.toString().slice(2)}'`;
   };
 
-  const toggleYear = (year) => {
-    setSelectedYears((prev) =>
-      prev.includes(year) ? prev.filter((y) => y !== year) : [...prev, year]
-    );
+  const getTitulo = () => {
+    if (selectedYear === "todos") {
+      return "Todos los años";
+    }
+    return `Año ${selectedYear}`;
   };
 
-  const dataConMesFormateado = data.map((item) => ({
+  const dataConMesFormateado = dataFiltrada.map((item) => ({
     ...item,
     mes_label: formatMes(item.mes, item.anio),
   }));
 
-  const ventasConMesFormateado = ventasData.map((item) => ({
+  const ventasConMesFormateado = ventasFiltrada.map((item) => ({
     ...item,
     mes_label: formatMes(item.mes, item.anio),
   }));
 
   // CÁLCULOS VENTAS
-  const ultimoVenta = ventasData[ventasData.length - 1];
+  const ultimoVenta = ventasFiltrada[ventasFiltrada.length - 1];
 
   // CÁLCULOS PRODUCCIÓN
   const getDisponibilidadPorAnio = () => {
     const anios = {};
-    data.forEach((item) => {
+    dataFiltrada.forEach((item) => {
       if (!anios[item.anio]) {
         anios[item.anio] = { suma: 0, count: 0 };
       }
@@ -109,21 +124,31 @@ export default function DashboardCompleto() {
   };
 
   const getCostoUnitarioPorMes = () => {
-    if (data.length === 0) return [];
-    const anioMasReciente = Math.max(...data.map((item) => item.anio));
-    const datosAnioReciente = data.filter(
-      (item) => item.anio === anioMasReciente
-    );
-    return datosAnioReciente.slice(-4).map((item) => ({
-      mes_label: formatMes(item.mes, item.anio),
-      costo: item.costo_unitario_produccion,
-    }));
+    if (dataFiltrada.length === 0) return [];
+
+    if (selectedYear === "todos") {
+      const anioMasReciente = Math.max(
+        ...dataFiltrada.map((item) => item.anio)
+      );
+      const datosAnioReciente = dataFiltrada.filter(
+        (item) => item.anio === anioMasReciente
+      );
+      return datosAnioReciente.slice(-4).map((item) => ({
+        mes_label: formatMes(item.mes, item.anio),
+        costo: item.costo_unitario_produccion,
+      }));
+    } else {
+      return dataFiltrada.slice(-4).map((item) => ({
+        mes_label: formatMes(item.mes, item.anio),
+        costo: item.costo_unitario_produccion,
+      }));
+    }
   };
 
   // CÁLCULOS CALIDAD
   const getFallasPorEquipo = () => {
     const equipos = {};
-    data.forEach((item) => {
+    dataFiltrada.forEach((item) => {
       if (!equipos[item.equipo_con_fallas]) {
         equipos[item.equipo_con_fallas] = 0;
       }
@@ -139,7 +164,7 @@ export default function DashboardCompleto() {
 
   const getUnidadesSinDefectosPorAnio = () => {
     const anios = {};
-    data.forEach((item) => {
+    dataFiltrada.forEach((item) => {
       if (!anios[item.anio]) {
         anios[item.anio] = {
           suma_sin_defectos: 0,
@@ -167,7 +192,7 @@ export default function DashboardCompleto() {
   // CÁLCULOS LOGÍSTICA
   const getNivelServicioPorAnio = () => {
     const anios = {};
-    data.forEach((item) => {
+    dataFiltrada.forEach((item) => {
       if (!anios[item.anio]) {
         anios[item.anio] = { suma: 0, count: 0 };
       }
@@ -183,7 +208,7 @@ export default function DashboardCompleto() {
   };
 
   const getTiemposEntregaMayores4 = () => {
-    return data
+    return dataFiltrada
       .filter((item) => item.tiempo_entrega_mes_dias > 4)
       .map((item) => ({
         mes_label: formatMes(item.mes, item.anio),
@@ -192,7 +217,7 @@ export default function DashboardCompleto() {
   };
 
   const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042"];
-  const ultimo = data[data.length - 1];
+  const ultimo = dataFiltrada[dataFiltrada.length - 1];
   const disponibilidadData = getDisponibilidadPorAnio();
   const costoUnitarioData = getCostoUnitarioPorMes();
   const fallasEquipoData = getFallasPorEquipo();
@@ -202,7 +227,26 @@ export default function DashboardCompleto() {
 
   return (
     <div className="relative p-6 space-y-12 divSubMenuPpal">
-      {/* Header */}
+      {/* Dropdown años */}
+      <div className="fixed top-6 right-2.5 bg-gray-800 p-4 rounded-lg shadow-lg z-50 miCuadrado">
+        <h4 className="text-white font-semibold mb-2">Filtrar por año</h4>
+        <select
+          id="yearSelect"
+          name="year"
+          value={selectedYear}
+          onChange={(e) => setSelectedYear(e.target.value)}
+          className="select-custom"
+        >
+          <option value="todos">Todos</option>
+          {availableYears.map((anio) => (
+            <option key={anio} value={anio}>
+              {anio}
+            </option>
+          ))}
+        </select>
+      </div>
+
+      {/* Botones superiores */}
       <div className="flex justify-between items-center mb-6">
         <button
           onClick={() => navigate("/")}
@@ -210,19 +254,13 @@ export default function DashboardCompleto() {
         >
           ⬅️ Volver
         </button>
-        <button
-          onClick={fetchData}
-          disabled={loading}
-          className={`btnFlotante btnActualizar px-4 py-2 ${
-            loading ? "bg-blue-300" : "bg-blue-600 hover:bg-blue-800"
-          } text-white rounded-lg shadow transition-all`}
-        >
-          🔄 {loading ? "Actualizando..." : "os"}
-        </button>
       </div>
+
       {/* ==================== SECCIÓN VENTAS ==================== */}
       <div className="bg-white rounded-lg shadow-xl p-8">
-        <h2 className="text-2xl font-bold text-gray-800 text-center">TODOS</h2>
+        <h2 className="text-2xl font-bold text-gray-800 text-center mb-4">
+          {getTitulo()}
+        </h2>
         <div className="border-b-4 border-green-500 pb-4 mb-6">
           <h2 className="text-3xl font-bold text-gray-800">💰 VENTAS</h2>
         </div>
@@ -417,15 +455,15 @@ export default function DashboardCompleto() {
               Unidades Producidas
             </h3>
             <p className="text-xl font-bold text-indigo-600">
-              {ultimo.unidades_producidas.toLocaleString()}
+              {ultimo.unidades_producidas}
             </p>
           </div>
           <div className="bg-cyan-50 rounded-lg shadow p-4 text-center">
             <h3 className="text-sm font-medium text-gray-500">
-              Horas Producción
+              Equipo con Fallas
             </h3>
             <p className="text-xl font-bold text-cyan-600">
-              {ultimo.horas_produccion_mes}h
+              {ultimo.equipo_con_fallas}
             </p>
           </div>
         </div>
@@ -568,14 +606,16 @@ export default function DashboardCompleto() {
           </div>
           <div className="bg-rose-50 rounded-lg shadow p-4 text-center">
             <h3 className="text-sm font-medium text-gray-500">Total Fallas</h3>
-            <p className="text-xl font-bold text-rose-600">{data.length}</p>
+            <p className="text-xl font-bold text-rose-600">
+              {dataFiltrada.length}
+            </p>
           </div>
           <div className="bg-lime-50 rounded-lg shadow p-4 text-center">
             <h3 className="text-sm font-medium text-gray-500">
               Unidades Producidas
             </h3>
             <p className="text-xl font-bold text-lime-600">
-              {ultimo.unidades_producidas.toLocaleString()}
+              {ultimo.unidades_producidas}
             </p>
           </div>
         </div>
@@ -869,6 +909,9 @@ export default function DashboardCompleto() {
             hour: "2-digit",
             minute: "2-digit",
           })}
+        </p>
+        <p className="text-xs mt-2">
+          Mostrando {dataFiltrada.length} registros
         </p>
       </div>
     </div>

@@ -46,3 +46,5 @@ npm run dev
 Y listo!! Ya deberias poder hacer click en el enlace de
   ➜  Local:   http://localhost:5173/ e ir al proyecto
 -----------------/FRONT-------------------
+
+La 2da vez que quiera ejecutar todo solamente pone 'npm run dev' en ambas carpetas.
