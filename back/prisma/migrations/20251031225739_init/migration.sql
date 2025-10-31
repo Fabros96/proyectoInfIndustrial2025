@@ -22,7 +22,7 @@ CREATE TABLE `Produccion` (
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- CreateTable
-CREATE TABLE `Venta` (
+CREATE TABLE `Ventas` (
     `id_venta` INTEGER NOT NULL AUTO_INCREMENT,
     `id_tiempo` INTEGER NOT NULL,
     `ventas_totales` DECIMAL(12, 2) NOT NULL,
@@ -63,7 +63,7 @@ CREATE TABLE `Logistica` (
 ALTER TABLE `Produccion` ADD CONSTRAINT `Produccion_id_tiempo_fkey` FOREIGN KEY (`id_tiempo`) REFERENCES `Tiempo`(`id_tiempo`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `Venta` ADD CONSTRAINT `Venta_id_tiempo_fkey` FOREIGN KEY (`id_tiempo`) REFERENCES `Tiempo`(`id_tiempo`) ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE `Ventas` ADD CONSTRAINT `Ventas_id_tiempo_fkey` FOREIGN KEY (`id_tiempo`) REFERENCES `Tiempo`(`id_tiempo`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE `Calidad` ADD CONSTRAINT `Calidad_id_tiempo_fkey` FOREIGN KEY (`id_tiempo`) REFERENCES `Tiempo`(`id_tiempo`) ON DELETE CASCADE ON UPDATE CASCADE;
